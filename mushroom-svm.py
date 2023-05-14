@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn import svm
 from sklearn.model_selection import train_test_split
@@ -30,7 +31,7 @@ X = data.iloc[:, 1:]
 ppX = X.apply(lambda x: pd.factorize(x)[0])
 ppX = ppX.astype('int')
 
-ppY = Y.replace({'p': 1, 'e': 0})
+ppY = Y.replace({'p': 1, 'e': -1})
 ppY = ppY.astype('int')
 
 # separate data into training and test
@@ -69,6 +70,30 @@ for i, v in enumerate(clf_lin.coef_[0]):
 print("\nPlotting Feature Importance...")
 plot_importance(clf_lin, features)
 
+# We notice that the two most important features: gill-size and bruises, are both binary features, so we go down the
+# list of important features until we find 2 non-binary features: ring-number, and stalk-color-above-ring
+
+# ===Plotting===
+plt.figure(figsize=(10,8))
+
+sns.scatterplot(x=X_train["ring-number"],
+                y=X_train["stalk-color-above-ring"],
+                hue=y_train,
+                s=8)
+# Construct hyperplane
+w = clf_lin.coef_[0]
+b = clf_lin.intercept_[0]
+x_points = np.linspace(-1,1)
+y_points = -(w[0] / w[1]) * x_points - b / w[1]
+plt.plot(x_points, y_points, c='r')
+plt.show()
+
+# create dataframe for plot.py
+X_save = pd.DataFrame()
+X_save.insert(0, "class", y_test)
+X_save.insert(1, "stalk-color-above-ring", X_test["stalk-color-above-ring"])
+X_save.insert(1, "ring-number", X_test["ring-number"])
+
 # recreate test dataframe and save dataframes to txt file for plot.py
-np.savetxt('./test_data.txt', X_test.values, fmt='%d')
+np.savetxt('./plot_data.txt', X_save.values, fmt='%d')
 np.savetxt('./svm_prediction.txt', prediction, fmt='%d')
