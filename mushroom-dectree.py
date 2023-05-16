@@ -48,6 +48,8 @@ tree.plot_tree(pruned_tree.fit(X_train, y_train),
                feature_names = x.columns, rounded=True,
                filled = True);
 
+plt.title("Mushroom Classification Decision Tree")
+
 plt.show()
 
 # checking prediction accuracy
